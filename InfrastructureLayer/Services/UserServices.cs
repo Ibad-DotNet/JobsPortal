@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ApplicationLayer.DTOs.CommonVMs;
+﻿using ApplicationLayer.DTOs.CommonVMs;
 using ApplicationLayer.DTOs.UserVM;
 using ApplicationLayer.Interfaces;
 using DomainLayer.Entities.UserEntities;
@@ -34,10 +29,10 @@ namespace InfrastructureLayer.Services
                 var user = await _appDbContext.UserEntity.FirstOrDefaultAsync(u => u.UserName == newUser.UserName || u.Email == newUser.UserName);
                 if (user != null)
                 {
-                    if (user.Password == newUser.Password)
+                    if ( BasicUtiltiy.VerifyPassword( newUser.Password, user.Password))
                     {
                         responseVM.Code = StatusCodeEnum.Success;
-                        responseVM.Message = "Logged In successfully";
+                        responseVM.Message = ResponseValues.LoginSuccess;
                         LoginUserResponse loggedUser = new LoginUserResponse();
                         loggedUser.Username = user.UserName;
                         loggedUser.FullName = user.Name;
@@ -49,13 +44,13 @@ namespace InfrastructureLayer.Services
                     else
                     {
                         responseVM.Code = StatusCodeEnum.BadRequest;
-                        responseVM.Message = "Incorrect Password";
+                        responseVM.Message = ResponseValues.WrongPassword;
                     }
                 }
                 else
                 {
                     responseVM.Code = StatusCodeEnum.BadRequest;
-                    responseVM.Message = "User Not Found with this Email or UserName";
+                    responseVM.Message = ResponseValues.UserNotFound;
                 }
             }
             catch (Exception ex)
@@ -99,6 +94,124 @@ namespace InfrastructureLayer.Services
                 responseVM.Message=ResponseValues.UnAuthorized;
             }
                 return responseVM;
+        }
+        public async Task<ResponseVM> GetAllUsers()
+        {
+            var response = new ResponseVM();
+            var users = await _appDbContext.UserEntity.ToListAsync();
+            response.Code = StatusCodeEnum.Success;
+            response.Data = users.Select(u => new GetUserResponse
+            {
+                Id = u.Id,
+                Name = u.Name,
+                Email = u.Email,
+                Gender = u.Gender,
+                Role = u.Role,
+                UserName = u.UserName
+            }).ToList();
+            response.Message = ResponseValues.Success;
+            return response;
+        }
+
+        public async Task<ResponseVM> GetUserById(int id)
+        {
+            var response = new ResponseVM();
+            var user = await _appDbContext.UserEntity.FindAsync(id);
+            if (user == null)
+            {
+                response.Code = StatusCodeEnum.BadRequest;
+                response.Message = ResponseValues.UserNotFound;
+                return response;
+            }
+            response.Code = StatusCodeEnum.Success;
+            response.Data = new GetUserResponse
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Gender = user.Gender,
+                Role = user.Role,
+                UserName = user.UserName
+            };
+            response.Message = ResponseValues.Success;
+            return response;
+        }
+
+        public async Task<ResponseVM> UpdateUser(UpdateUserRequest request)
+        {
+            var response = new ResponseVM();
+            var user = await _appDbContext.UserEntity.FindAsync(request.Id);
+            if (user == null)
+            {
+                response.Code = StatusCodeEnum.BadRequest;
+                response.Message = ResponseValues.UserNotFound;
+                return response;
+            }
+
+            user.Name = request.Name ?? user.Name;
+            user.Gender = request.Gender ?? user.Gender;
+            if (!string.IsNullOrWhiteSpace(request.Password))
+            {
+                user.Password = BasicUtiltiy.EncryptedPassword(request.Password);
+            }
+
+            _appDbContext.UserEntity.Update(user);
+            await _appDbContext.SaveChangesAsync();
+
+            response.Code = StatusCodeEnum.Success;
+            response.Message = ResponseValues.Updated;
+            return response;
+        }
+        public async Task<ResponseVM> PatchUserAsync(PatchUserRequest request)
+        {
+            var response = new ResponseVM();
+
+            var user = await _appDbContext.UserEntity.FindAsync(request.Id);
+            if (user == null)
+            {
+                response.Code = StatusCodeEnum.BadRequest;
+                response.Message = ResponseValues.UserNotFound;
+                return response;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Name))
+                user.Name = request.Name;
+
+            if (!string.IsNullOrWhiteSpace(request.Gender))
+                user.Gender = request.Gender;
+
+            if (!string.IsNullOrWhiteSpace(request.Password))
+                user.Password = BasicUtiltiy.EncryptedPassword(request.Password);
+
+            if (!string.IsNullOrWhiteSpace(request.Role))
+                user.Role = request.Role;
+
+            _appDbContext.UserEntity.Update(user);
+            await _appDbContext.SaveChangesAsync();
+
+            response.Code = StatusCodeEnum.Success;
+            response.Message = ResponseValues.Updated;
+            return response;
+        }
+
+
+        public async Task<ResponseVM> DeleteUser(int id)
+        {
+            var response = new ResponseVM();
+            var user = await _appDbContext.UserEntity.FindAsync(id);
+            if (user == null)
+            {
+                response.Code = StatusCodeEnum.BadRequest;
+                response.Message = ResponseValues.UserNotFound;
+                return response;
+            }
+
+            _appDbContext.UserEntity.Remove(user);
+            await _appDbContext.SaveChangesAsync();
+
+            response.Code = StatusCodeEnum.Success;
+            response.Message = ResponseValues.Deleted;
+            return response;
         }
     }
 }

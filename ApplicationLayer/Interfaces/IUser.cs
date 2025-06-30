@@ -10,7 +10,12 @@ namespace ApplicationLayer.Interfaces
 {
     public interface IUser
     {
-        public Task<ResponseVM> Login(LoginUserRequest user);
-        public Task<ResponseVM> AddRecuriter(AddUserRequest user);
+        Task<ResponseVM> Login(LoginUserRequest user);
+        Task<ResponseVM> AddRecuriter(AddUserRequest user);
+        Task<ResponseVM> GetAllUsers();
+        Task<ResponseVM> GetUserById(int id);
+        Task<ResponseVM> UpdateUser(UpdateUserRequest request);
+        Task<ResponseVM> PatchUserAsync(PatchUserRequest request);
+        Task<ResponseVM> DeleteUser(int id);
     }
 }
