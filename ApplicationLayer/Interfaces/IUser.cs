@@ -17,5 +17,6 @@ namespace ApplicationLayer.Interfaces
         Task<ResponseVM> UpdateUser(UpdateUserRequest request);
         Task<ResponseVM> PatchUserAsync(PatchUserRequest request);
         Task<ResponseVM> DeleteUser(int id);
+        Task<ResponseVM> UpdateUserStatusAsync(UpdateUserStatusRequest request);
     }
 }

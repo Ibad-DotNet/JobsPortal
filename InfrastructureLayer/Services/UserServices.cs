@@ -213,5 +213,25 @@ namespace InfrastructureLayer.Services
             response.Message = ResponseValues.Deleted;
             return response;
         }
+        public async Task<ResponseVM> UpdateUserStatusAsync(UpdateUserStatusRequest request)
+        {
+            var response = new ResponseVM();
+            var user = await _appDbContext.UserEntity.FindAsync(request.Id);
+
+            if (user == null)
+            {
+                response.Code = StatusCodeEnum.BadRequest;
+                response.Message = ResponseValues.UserNotFound;
+                return response;
+            }
+
+            user.IsActive = request.IsActive;
+            _appDbContext.UserEntity.Update(user);
+            await _appDbContext.SaveChangesAsync();
+
+            response.Code = StatusCodeEnum.Success;
+            response.Message = request.IsActive ? ResponseValues.UserActivated : ResponseValues.UserDeactivated;
+            return response;
+        }
     }
 }
