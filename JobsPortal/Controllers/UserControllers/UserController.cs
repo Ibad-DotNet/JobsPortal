@@ -100,5 +100,23 @@ namespace JobsPortal.Controllers.UserControllers
             var result = await _user.DeleteUser(id);
             return Ok(result);
         }
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("update-status")]
+        public async Task<ActionResult<ResponseVM>> UpdateUserStatus([FromBody] UpdateUserStatusRequest request)
+        {
+            try
+            {
+                var result = await _user.UpdateUserStatusAsync(request);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new ResponseVM
+                {
+                    Message = "Internal Server Error"
+                });
+            }
+        }
+
     }
 }

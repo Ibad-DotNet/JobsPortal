@@ -51,5 +51,9 @@ namespace DomainLayer.Enums
         //   Roles / Permissions
         public const string RoleNotPermitted = "Your role does not have permission for this action";
         public const string RoleMismatch = "User role mismatch";
+
+        //   User Messages
+        public const string UserActivated = "User activated successfully";
+        public const string UserDeactivated = "User deactivated successfully";
     }
 }
