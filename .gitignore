@@ -59,3 +59,5 @@ nunit-*.xml
 
 # VS Code history
 .history/
+node_modules/
+

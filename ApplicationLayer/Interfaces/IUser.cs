@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ApplicationLayer.DTOs.CommonVMs;
-using ApplicationLayer.DTOs.UserVM;
+using ApplicationLayer.DTOs.CommonDTOs;
+using ApplicationLayer.DTOs.UserDTOs;
 
 namespace ApplicationLayer.Interfaces
 {

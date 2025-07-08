@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DomainLayer.Enums;
 
-namespace ApplicationLayer.DTOs.CommonVMs
+namespace ApplicationLayer.DTOs.CommonDTOs
 {
     public class ResponseVM
     {

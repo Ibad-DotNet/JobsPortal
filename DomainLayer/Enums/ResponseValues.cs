@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DomainLayer.Enums
 {
@@ -52,8 +48,16 @@ namespace DomainLayer.Enums
         public const string RoleNotPermitted = "Your role does not have permission for this action";
         public const string RoleMismatch = "User role mismatch";
 
-        //   User Messages
+        //   User Status
         public const string UserActivated = "User activated successfully";
         public const string UserDeactivated = "User deactivated successfully";
+
+        //   Job Status
+        public const string JobActivated = "Job activated successfully";
+        public const string JobDeactivated = "Job deactivated successfully";
+
+        //   Generic
+        public const string StatusUpdated = "Status updated successfully";
+        public const string PartialUpdate = "Partial update completed successfully";
     }
 }

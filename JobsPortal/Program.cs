@@ -12,8 +12,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddInfrastructureServices(); 
-builder.Services.AddHttpContextAccessor();    
+builder.Services.AddInfrastructureServices();
+builder.Services.AddHttpContextAccessor();
 
 
 var jwtKey = builder.Configuration["Jwt:Key"]
@@ -46,7 +46,15 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RecuriterorAdmin", policy => policy.RequireRole("Recuriter", "Admin"));
     options.AddPolicy("RecuriterOnly", policy => policy.RequireClaim("Recuriter"));
 });
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -89,8 +97,8 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 }
 
 app.UseHttpsRedirection();
-
-app.UseAuthentication();  
+app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

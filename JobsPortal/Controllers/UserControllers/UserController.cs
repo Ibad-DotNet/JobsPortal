@@ -1,5 +1,5 @@
-﻿using ApplicationLayer.DTOs.CommonVMs;
-using ApplicationLayer.DTOs.UserVM;
+﻿using ApplicationLayer.DTOs.CommonDTOs;
+using ApplicationLayer.DTOs.UserDTOs;
 using ApplicationLayer.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +34,7 @@ namespace JobsPortal.Controllers.UserControllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add-recuriter")]
         public async Task<ActionResult<ResponseVM>> AddRecurietr(AddUserRequest request)
         {
@@ -52,7 +52,7 @@ namespace JobsPortal.Controllers.UserControllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("get-all")]
         public async Task<ActionResult<ResponseVM>> GetAllUsers()
         {
@@ -60,7 +60,7 @@ namespace JobsPortal.Controllers.UserControllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("get/{id}")]
         public async Task<ActionResult<ResponseVM>> GetUserById(int id)
         {
@@ -68,16 +68,16 @@ namespace JobsPortal.Controllers.UserControllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("update")]
         public async Task<ActionResult<ResponseVM>> UpdateUser(UpdateUserRequest request)
         {
             var result = await _user.UpdateUser(request);
             return Ok(result);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPatch("patch")]
-        public async Task<ActionResult<ResponseVM>> PatchUser([FromBody] PatchUserRequest request)
+        public async Task<ActionResult<ResponseVM>> PatchUser(PatchUserRequest request)
         {
             try
             {
@@ -93,16 +93,16 @@ namespace JobsPortal.Controllers.UserControllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("delete/{id}")]
         public async Task<ActionResult<ResponseVM>> DeleteUser(int id)
         {
             var result = await _user.DeleteUser(id);
             return Ok(result);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPatch("update-status")]
-        public async Task<ActionResult<ResponseVM>> UpdateUserStatus([FromBody] UpdateUserStatusRequest request)
+        public async Task<ActionResult<ResponseVM>> UpdateUserStatus(UpdateUserStatusRequest request)
         {
             try
             {
