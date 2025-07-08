@@ -7,8 +7,9 @@ namespace JobsPortal.Configurations
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
         {
-            services.AddScoped<IUser, UserServices>();
             services.AddScoped<TokenServices>();
+            services.AddScoped<IUser, UserServices>();
+            services.AddScoped<IJob,JobServices>();
 
             return services;
         }

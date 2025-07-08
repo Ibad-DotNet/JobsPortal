@@ -1,5 +1,5 @@
-﻿using ApplicationLayer.DTOs.CommonVMs;
-using ApplicationLayer.DTOs.UserVM;
+﻿using ApplicationLayer.DTOs.CommonDTOs;
+using ApplicationLayer.DTOs.UserDTOs;
 using ApplicationLayer.Interfaces;
 using DomainLayer.Entities.UserEntities;
 using DomainLayer.Enums;
