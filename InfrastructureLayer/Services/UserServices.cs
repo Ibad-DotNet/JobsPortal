@@ -113,7 +113,7 @@ namespace InfrastructureLayer.Services
             return response;
         }
 
-        public async Task<ResponseVM> GetUserById(int id)
+        public async Task<ResponseVM> GetUserById(long id)
         {
             var response = new ResponseVM();
             var user = await _appDbContext.UserEntity.FindAsync(id);
@@ -195,7 +195,7 @@ namespace InfrastructureLayer.Services
         }
 
 
-        public async Task<ResponseVM> DeleteUser(int id)
+        public async Task<ResponseVM> DeleteUser(long id)
         {
             var response = new ResponseVM();
             var user = await _appDbContext.UserEntity.FindAsync(id);

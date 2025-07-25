@@ -21,7 +21,7 @@ namespace DomainLayer.Entities.JobEntities
         public string JobQualifications { get; set; } = "";
         public decimal MinimumSalary { get; set; } 
         public decimal MaximumSalary { get; set; }
-        public int InterviewStages = 0;
+        public int InterviewStages = 1;
         public bool IsActive { get; set; } = true;
         public bool IsDeleted { get; set; } = false;
         public DateTime StartDate { get; set; }

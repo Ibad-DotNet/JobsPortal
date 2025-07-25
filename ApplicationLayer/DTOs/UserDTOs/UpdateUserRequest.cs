@@ -8,7 +8,7 @@ namespace ApplicationLayer.DTOs.UserDTOs
 {
     public class UpdateUserRequest
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; } = "";
         public string Gender { get; set; } = "";
         public string Password { get; set; } = "";

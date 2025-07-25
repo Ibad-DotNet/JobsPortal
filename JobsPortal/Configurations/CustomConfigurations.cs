@@ -10,6 +10,7 @@ namespace JobsPortal.Configurations
             services.AddScoped<TokenServices>();
             services.AddScoped<IUser, UserServices>();
             services.AddScoped<IJob,JobServices>();
+            services.AddScoped<ICandidate, CandidateService>();
 
             return services;
         }

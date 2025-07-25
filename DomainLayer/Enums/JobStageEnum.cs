@@ -16,7 +16,8 @@ namespace DomainLayer.Enums
         {
             new JobStages(1, "Screening"),
             new JobStages(2, "TechnicalInterview"),
-            new JobStages(3, "FinalCall")
+            new JobStages(3, "FinalCall"),
+            new JobStages(4, "Offered")
         };
     }
 }

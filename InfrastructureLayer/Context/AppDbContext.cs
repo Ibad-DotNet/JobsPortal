@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DomainLayer.Entities.CandidateEntities;
 using DomainLayer.Entities.JobEntities;
 using DomainLayer.Entities.UserEntities;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace InfrastructureLayer.Context
         }
         public DbSet<UserEntity> UserEntity { get; set; }
         public DbSet<JobEntity> JobEntity { get; set; }
+        public DbSet<CandidateEntity> CandidateEntity { get; set; }
 
     }
 }

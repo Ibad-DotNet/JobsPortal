@@ -1,5 +1,7 @@
 using System.Text;
+using CloudinaryDotNet;
 using InfrastructureLayer.Context;
+using InfrastructureLayer.Utilities;
 using JobsPortal.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -43,8 +45,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("RecuriterorAdmin", policy => policy.RequireRole("Recuriter", "Admin"));
-    options.AddPolicy("RecuriterOnly", policy => policy.RequireClaim("Recuriter"));
+    options.AddPolicy("RecuriterorAdmin", policy => policy.RequireRole("Recruiter", "Admin"));
+    options.AddPolicy("RecuriterOnly", policy => policy.RequireRole("Recruiter"));
 });
 builder.Services.AddCors(options =>
 {
@@ -87,6 +89,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddControllers();
+AWS_StorageUtility.Configure(builder.Configuration);
 
 var app = builder.Build();
 

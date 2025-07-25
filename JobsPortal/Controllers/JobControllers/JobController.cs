@@ -4,8 +4,9 @@ using ApplicationLayer.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace JobsPortal.Controllers.JobPortals
+namespace JobsPortal.Controllers.UserControllers
 {
+    [Authorize(Policy = "RecuriterOnly")]
     [Route("api/job")]
     [ApiController]
     public class JobController : ControllerBase
@@ -17,7 +18,6 @@ namespace JobsPortal.Controllers.JobPortals
             _job = job;
         }
 
-        [Authorize(Policy = "RecuriterOnly")]
         [HttpPost("add")]
         public async Task<ActionResult<ResponseVM>> AddJob(  AddJobRequest request)
         {
@@ -34,8 +34,6 @@ namespace JobsPortal.Controllers.JobPortals
                 });
             }
         }
-
-        [Authorize(Policy = "RecuriterOnly")]
         [HttpGet("get-all")]
         public async Task<ActionResult<ResponseVM>> GetAllJobs()
         {
@@ -43,7 +41,6 @@ namespace JobsPortal.Controllers.JobPortals
             return Ok(result);
         }
 
-        [Authorize(Policy = "RecuriterOnly")]
         [HttpGet("get/{id}")]
         public async Task<ActionResult<ResponseVM>> GetJobById(long id)
         {
@@ -51,7 +48,6 @@ namespace JobsPortal.Controllers.JobPortals
             return Ok(result);
         }
 
-        [Authorize(Policy = "RecuriterOnly")]
         [HttpPut("update")]
         public async Task<ActionResult<ResponseVM>> UpdateJob(  UpdateJobRequest request)
         {
@@ -59,7 +55,6 @@ namespace JobsPortal.Controllers.JobPortals
             return Ok(result);
         }
 
-        [Authorize(Policy = "RecuriterOnly")]
         [HttpDelete("delete/{id}")]
         public async Task<ActionResult<ResponseVM>> DeleteJob(long id)
         {
@@ -67,7 +62,6 @@ namespace JobsPortal.Controllers.JobPortals
             return Ok(result);
         }
 
-        [Authorize(Policy = "RecuriterOnly")]
         [HttpPatch("update-status")]
         public async Task<ActionResult<ResponseVM>> UpdateJobStatus(  UpdateJobStatusRequest request)
         {
@@ -84,7 +78,7 @@ namespace JobsPortal.Controllers.JobPortals
                 });
             }
         }
-        [Authorize(Policy = "RecuriterOnly")]
+        
         [HttpPatch("patch")]
         public async Task<ActionResult<ResponseVM>> PatchJob(  PatchJobRequest request)
         {

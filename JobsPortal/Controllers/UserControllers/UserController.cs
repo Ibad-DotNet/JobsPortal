@@ -34,7 +34,7 @@ namespace JobsPortal.Controllers.UserControllers
             }
         }
 
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("add-recuriter")]
         public async Task<ActionResult<ResponseVM>> AddRecurietr(AddUserRequest request)
         {
@@ -52,7 +52,7 @@ namespace JobsPortal.Controllers.UserControllers
             }
         }
 
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet("get-all")]
         public async Task<ActionResult<ResponseVM>> GetAllUsers()
         {
@@ -60,22 +60,22 @@ namespace JobsPortal.Controllers.UserControllers
             return Ok(result);
         }
 
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet("get/{id}")]
-        public async Task<ActionResult<ResponseVM>> GetUserById(int id)
+        public async Task<ActionResult<ResponseVM>> GetUserById(long id)
         {
             var result = await _user.GetUserById(id);
             return Ok(result);
         }
 
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("update")]
         public async Task<ActionResult<ResponseVM>> UpdateUser(UpdateUserRequest request)
         {
             var result = await _user.UpdateUser(request);
             return Ok(result);
         }
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPatch("patch")]
         public async Task<ActionResult<ResponseVM>> PatchUser(PatchUserRequest request)
         {
@@ -93,14 +93,14 @@ namespace JobsPortal.Controllers.UserControllers
             }
         }
 
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("delete/{id}")]
-        public async Task<ActionResult<ResponseVM>> DeleteUser(int id)
+        public async Task<ActionResult<ResponseVM>> DeleteUser(long id)
         {
             var result = await _user.DeleteUser(id);
             return Ok(result);
         }
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPatch("update-status")]
         public async Task<ActionResult<ResponseVM>> UpdateUserStatus(UpdateUserStatusRequest request)
         {
