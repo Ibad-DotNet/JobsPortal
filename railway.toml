@@ -1,7 +1,0 @@
-[build]
-  builder = "dockerfile"
-  dockerfilePath = "./JobsPortal/dockerfile"  # note lowercase here
-
-[deploy]
-  restartPolicyType = "always"
-  healthcheckPath = "/health"
