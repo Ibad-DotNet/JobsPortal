@@ -1,8 +1,7 @@
 [build]
   builder = "dockerfile"
-  dockerfilePath = "./JobsPortal/dockerfile"
+  dockerfilePath = "./JobsPortal/dockerfile"  # note lowercase here
 
 [deploy]
-  startCommand = "./JobsPortal"
   restartPolicyType = "always"
   healthcheckPath = "/health"
