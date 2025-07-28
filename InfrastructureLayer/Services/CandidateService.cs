@@ -154,7 +154,7 @@ namespace InfrastructureLayer.Services
             }
             else
             {
-                candidate.InterviewStage = 4;
+                candidate.InterviewStage = JobStageEnum.Offered;
             }
             _context.CandidateEntity.Update(candidate);
             await _context.SaveChangesAsync();

@@ -10,6 +10,9 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = builder.Configuration["PORT"] ?? "5000";
+builder.WebHost.UseUrls($"http://*:{port}");
+builder.Services.AddHealthChecks();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -98,7 +101,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
