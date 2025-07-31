@@ -26,7 +26,7 @@ namespace InfrastructureLayer.Services
             ResponseVM responseVM = new ResponseVM();
             try
             {
-                var user = await _appDbContext.UserEntity.FirstOrDefaultAsync(u => u.UserName == newUser.UserName || u.Email == newUser.UserName);
+                var user = await _appDbContext.UserEntity.FirstOrDefaultAsync(u =>u.IsActive && (u.UserName == newUser.UserName || u.Email == newUser.UserName));
                 if (user != null)
                 {
                     if ( BasicUtiltiy.VerifyPassword( newUser.Password, user.Password))
@@ -98,7 +98,7 @@ namespace InfrastructureLayer.Services
         public async Task<ResponseVM> GetAllUsers()
         {
             var response = new ResponseVM();
-            var users = await _appDbContext.UserEntity.ToListAsync();
+            var users = await _appDbContext.UserEntity.Where(u=>u.Role!="Admin").ToListAsync();
             response.Code = StatusCodeEnum.Success;
             response.Data = users.Select(u => new GetUserResponse
             {
@@ -107,8 +107,22 @@ namespace InfrastructureLayer.Services
                 Email = u.Email,
                 Gender = u.Gender,
                 Role = u.Role,
-                UserName = u.UserName
+                UserName = u.UserName,
+                IsActive = u.IsActive,
             }).ToList();
+            response.Message = ResponseValues.Success;
+            return response;
+        }
+        public async Task<ResponseVM> GetAllUsersCount()
+        {
+            var response = new ResponseVM();
+            var users = await _appDbContext.UserEntity.Where(u => u.Role != "Admin").ToListAsync();
+            response.Code = StatusCodeEnum.Success;
+            response.Data = new
+            {
+                Total = users.Count(),
+                Active=users.Where(u=>u.IsActive).Count()
+            };
             response.Message = ResponseValues.Success;
             return response;
         }
@@ -144,7 +158,7 @@ namespace InfrastructureLayer.Services
             if (user == null)
             {
                 response.Code = StatusCodeEnum.BadRequest;
-                response.Message = ResponseValues.UserNotFound;
+                response.Message = ResponseValues.DataNotFound;
                 return response;
             }
 

@@ -13,6 +13,7 @@ namespace ApplicationLayer.Interfaces
         Task<ResponseVM> Login(LoginUserRequest user);
         Task<ResponseVM> AddRecuriter(AddUserRequest user);
         Task<ResponseVM> GetAllUsers();
+        Task<ResponseVM> GetAllUsersCount();
         Task<ResponseVM> GetUserById(long id);
         Task<ResponseVM> UpdateUser(UpdateUserRequest request);
         Task<ResponseVM> PatchUserAsync(PatchUserRequest request);

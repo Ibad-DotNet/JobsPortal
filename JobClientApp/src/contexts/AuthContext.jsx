@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import authApiService from '../api/authApiService';
+const loginUser = authApiService.login;
 
 const AuthContext = createContext();
 
@@ -14,11 +16,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // On first load, check localStorage for user data
   useEffect(() => {
-    // Check if user is logged in on app start
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('userData');
-    
+
     if (token && userData) {
       setUser(JSON.parse(userData));
     }
@@ -26,47 +28,22 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    // Simulate API call
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const users = [
-          {
-            email: 'admin@volmatica.com',
-            password: 'Admin@111',
-            username: 'System Administrator',
-            role: 'SystemAdmin',
-            token: 'admin_jwt_token_123'
-          },
-          {
-            email: 'Ibad@Volmatica.com',
-            password: 'Ibad@111',
-            username: 'Ibad Ahmed',
-            role: 'Recruiter',
-            token: 'recruiter_jwt_token_456'
-          }
-        ];
+    try {
+      const response = await loginUser({ userName: email, password }); // API call from js file
+      const userData = response;
+      console.log('Login response:', userData);
 
-        const foundUser = users.find(u => 
-          u.email.toLowerCase() === email.toLowerCase() && u.password === password
-        );
+      if (userData?.token) {
+        localStorage.setItem('token', userData.token);
+        localStorage.setItem('userData', JSON.stringify(userData));
+        setUser(userData);
+      }
 
-        if (foundUser) {
-          const userData = {
-            username: foundUser.username,
-            email: foundUser.email,
-            role: foundUser.role,
-            token: foundUser.token
-          };
-
-          localStorage.setItem('token', foundUser.token);
-          localStorage.setItem('userData', JSON.stringify(userData));
-          setUser(userData);
-          resolve(userData);
-        } else {
-          reject(new Error('Invalid email or password'));
-        }
-      }, 1000);
-    });
+      return userData;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
   };
 
   const logout = () => {
@@ -79,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     user,
     login,
     logout,
-    loading
+    loading,
   };
 
   return (

@@ -59,7 +59,13 @@ namespace JobsPortal.Controllers.UserControllers
             var result = await _user.GetAllUsers();
             return Ok(result);
         }
-
+        [Authorize(Policy = "AdminOnly")]
+        [HttpGet("get-user-count")]
+        public async Task<ActionResult<ResponseVM>> GetAllUsersCount()
+        {
+            var result = await _user.GetAllUsersCount();
+            return Ok(result);
+        }
         [Authorize(Policy = "AdminOnly")]
         [HttpGet("get/{id}")]
         public async Task<ActionResult<ResponseVM>> GetUserById(long id)
