@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Grid,
   Card,
@@ -29,19 +29,40 @@ import {
   Person,
   PersonAdd,
 } from '@mui/icons-material';
-import { useToast } from '../contexts/ToastContext';
 import RecruiterForm from '../components/admin/RecruiterForm';
-import { recruitersData } from '../data/mockData';
+import authApiService from '../api/authApiService';
+import {
+  addRecruiter,
+  getAllRecruiters,
+  getRecruitersCount,
+  updateRecruiter,
+  deleteRecruiter,
+  toggleRecruiterStatus,
+} from '../api/apiEndpoints';
 
 const AdminDashboard = () => {
-  const { showToast } = useToast();
-  const [recruiters, setRecruiters] = useState(recruitersData);
+  const [recruiters, setRecruiters] = useState([]);
   const [formOpen, setFormOpen] = useState(false);
   const [selectedRecruiter, setSelectedRecruiter] = useState(null);
   const [formMode, setFormMode] = useState('add'); // 'add', 'view', 'edit'
+  const [recruiterCounts, setRecruiterCounts] = useState({
+  total: 0,
+  active: 0,
+});
+const fetchRecruiterCounts = async () => {
+  const data = await authApiService.get(getRecruitersCount);
+  if (data) setRecruiterCounts(data);
+};
 
-  const totalRecruiters = recruiters.length;
-  const activeRecruiters = recruiters.filter(r => r.status === 'Active').length;
+const fetchRecruiters = async () => {
+    const data = await authApiService.get(getAllRecruiters);
+    if (data) setRecruiters(data);
+  };
+
+  useEffect(() => {
+    fetchRecruiterCounts();
+    fetchRecruiters();
+  }, []);
 
   const handleAddRecruiter = () => {
     setSelectedRecruiter(null);
@@ -61,34 +82,41 @@ const AdminDashboard = () => {
     setFormOpen(true);
   };
 
-  const handleDeleteRecruiter = (recruiterId) => {
-    setRecruiters(prev => prev.filter(r => r.id !== recruiterId));
-    showToast('Recruiter deleted successfully', 'success');
+  const handleDeleteRecruiter = async (id) => {
+    const endpoint = deleteRecruiter(id);
+    const success = await authApiService.delete(endpoint);
+    if (success) {
+      fetchRecruiters();
+      fetchRecruiterCounts();
+    }
   };
 
-  const handleToggleStatus = (recruiterId) => {
-    setRecruiters(prev => prev.map(r => 
-      r.id === recruiterId 
-        ? { ...r, status: r.status === 'Active' ? 'Inactive' : 'Active' }
-        : r
-    ));
-    showToast('Recruiter status updated successfully', 'success');
+  const handleToggleStatus = async (recruiter) => {
+    const updatedRecruiter = {
+      id: recruiter.id,
+      isActive: !recruiter.isActive 
+    };
+    const success = await authApiService.patch(toggleRecruiterStatus, updatedRecruiter);
+    if (success) {
+      fetchRecruiters();
+      fetchRecruiterCounts();
+    }
   };
 
-  const handleFormSubmit = (formData) => {
+  const handleFormSubmit = async (formData) => {
     if (formMode === 'add') {
-      const newRecruiter = {
-        id: Date.now(),
-        ...formData,
-        status: 'Active'
-      };
-      setRecruiters(prev => [...prev, newRecruiter]);
-      showToast('Recruiter added successfully', 'success');
+      const success = await authApiService.post(addRecruiter, formData);
+      if (success) fetchRecruiters();
     } else if (formMode === 'edit') {
-      setRecruiters(prev => prev.map(r => 
-        r.id === selectedRecruiter.id ? { ...r, ...formData } : r
-      ));
-      showToast('Recruiter updated successfully', 'success');
+      const payload = {
+        id: selectedRecruiter.id,
+        ...formData
+      };
+      const success = await authApiService.put(updateRecruiter, payload);
+      if (success) {
+        fetchRecruiters();
+        fetchRecruiterCounts();
+      }
     }
     setFormOpen(false);
   };
@@ -99,7 +127,7 @@ const AdminDashboard = () => {
         System Administrator Dashboard
       </Typography>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={6}>
           <Card>
@@ -108,7 +136,7 @@ const AdminDashboard = () => {
                 <Person sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
                 <Box>
                   <Typography variant="h3" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                    {totalRecruiters}
+                    {recruiterCounts.total}
                   </Typography>
                   <Typography variant="h6" color="text.secondary">
                     Total Recruiters
@@ -125,7 +153,7 @@ const AdminDashboard = () => {
                 <PersonAdd sx={{ fontSize: 40, color: 'success.main', mr: 2 }} />
                 <Box>
                   <Typography variant="h3" sx={{ fontWeight: 600, color: 'success.main' }}>
-                    {activeRecruiters}
+                    {recruiterCounts.active}
                   </Typography>
                   <Typography variant="h6" color="text.secondary">
                     Active Recruiters
@@ -137,25 +165,14 @@ const AdminDashboard = () => {
         </Grid>
       </Grid>
 
-      {/* Action Buttons */}
+      {/* Buttons */}
       <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <Button
-          variant="contained"
-          startIcon={<Add sx={{ fontSize: 18 }} />}
-          onClick={handleAddRecruiter}
-        >
+        <Button variant="contained" startIcon={<Add />} onClick={handleAddRecruiter}>
           Add Recruiter
-        </Button>
-        <Button
-          variant="outlined"
-          startIcon={<Visibility sx={{ fontSize: 18 }} />}
-          onClick={() => {/* View All functionality already shown in table */}}
-        >
-          View All Recruiters
         </Button>
       </Box>
 
-      {/* Recruiters Table */}
+      {/* Table */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -168,32 +185,31 @@ const AdminDashboard = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {recruiters.map((recruiter) => (
-              <TableRow key={recruiter.id}>
-                <TableCell>{recruiter.name}</TableCell>
-                <TableCell>{recruiter.email}</TableCell>
-                <TableCell>{recruiter.gender}</TableCell>
+            {recruiters.map((r) => (
+              <TableRow key={r.id}>
+                <TableCell>{r.name}</TableCell>
+                <TableCell>{r.email}</TableCell>
+                <TableCell>{r.gender}</TableCell>
                 <TableCell>
                   <Switch
-                    checked={recruiter.status === 'Active'}
-                    onChange={() => handleToggleStatus(recruiter.id)}
+                    checked={r.isActive}
+                    onChange={() => handleToggleStatus(r)}
                     color="primary"
                   />
-                  {recruiter.status}
                 </TableCell>
                 <TableCell align="center">
                   <Tooltip title="View">
-                    <IconButton onClick={() => handleViewRecruiter(recruiter)}>
+                    <IconButton onClick={() => handleViewRecruiter(r)}>
                       <Visibility sx={{ fontSize: 18 }} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Edit">
-                    <IconButton onClick={() => handleEditRecruiter(recruiter)}>
+                    <IconButton onClick={() => handleEditRecruiter(r)}>
                       <Edit sx={{ fontSize: 18 }} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Delete">
-                    <IconButton onClick={() => handleDeleteRecruiter(recruiter.id)}>
+                    <IconButton onClick={() => handleDeleteRecruiter(r.id)}>
                       <Delete sx={{ fontSize: 18 }} />
                     </IconButton>
                   </Tooltip>
@@ -204,18 +220,13 @@ const AdminDashboard = () => {
         </Table>
       </TableContainer>
 
-      {/* Recruiter Form Dialog */}
+      {/* Form Dialog */}
       <Dialog open={formOpen} onClose={() => setFormOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>
-          {formMode === 'add' ? 'Add New Recruiter' : 
-           formMode === 'edit' ? 'Edit Recruiter' : 'View Recruiter'}
+          {formMode === 'add' ? 'Add Recruiter' : formMode === 'edit' ? 'Edit Recruiter' : 'View Recruiter'}
         </DialogTitle>
         <DialogContent>
-          <RecruiterForm
-            recruiter={selectedRecruiter}
-            mode={formMode}
-            onSubmit={handleFormSubmit}
-          />
+          <RecruiterForm recruiter={selectedRecruiter} mode={formMode} onSubmit={handleFormSubmit} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setFormOpen(false)}>Cancel</Button>

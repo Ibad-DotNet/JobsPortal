@@ -10,7 +10,7 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var port = builder.Configuration["PORT"] ?? "5000";
+var port = builder.Configuration["PORT"] ?? "8080";
 builder.WebHost.UseUrls($"http://*:{port}");
 builder.Services.AddHealthChecks();
 builder.Services.AddDbContext<AppDbContext>(options =>

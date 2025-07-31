@@ -9,6 +9,7 @@ namespace DomainLayer.Enums
         public const string Updated = "Record updated successfully";
         public const string Deleted = "Record deleted successfully";
         public const string Success = "Operation completed successfully";
+        public const string DataNotFound = "Data not found against this Id";
 
         //   General Errors
         public const string Error = "Something went wrong";
