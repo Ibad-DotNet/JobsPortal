@@ -10,7 +10,8 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var port = builder.Configuration["PORT"] ?? "8080";
+// Handle Railway's PORT environment variable
+var port = Environment.GetEnvironmentVariable("PORT") ?? builder.Configuration["PORT"] ?? "8080";
 builder.WebHost.UseUrls($"http://*:{port}");
 builder.Services.AddHealthChecks();
 builder.Services.AddDbContext<AppDbContext>(options =>
