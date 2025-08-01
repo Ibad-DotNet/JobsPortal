@@ -2,7 +2,7 @@
 FROM node:18-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY JobClientApp/package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 COPY JobClientApp/ .
 RUN npm run build
 
@@ -34,6 +34,10 @@ COPY --from=publish /app/publish .
 # Copy frontend build
 COPY --from=frontend-build /app/frontend/dist ./wwwroot
 
-EXPOSE 8080
+# Set environment variables for Railway
+ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:8080
+ENV PORT=8080
+
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "JobsPortal.dll"]
