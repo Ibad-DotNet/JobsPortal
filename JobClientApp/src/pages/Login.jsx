@@ -87,8 +87,8 @@ const Login = () => {
 
             <Box sx={{ mt: 3, textAlign: 'center' }}>
               <Typography variant="body2" color="text.secondary">Demo Accounts:</Typography>
-              <Typography variant="body2" color="text.secondary">Admin: admin@volmatica.com / Admin@111</Typography>
-              <Typography variant="body2" color="text.secondary">Recruiter: Ibad@Volmatica.com / Ibad@111</Typography>
+              <Typography variant="body2" color="text.secondary">Admin: admin@volmatica.com / P@ssw0rd</Typography>
+              <Typography variant="body2" color="text.secondary">Recruiter: currently static </Typography>
             </Box>
           </Paper>
         </Grid>
