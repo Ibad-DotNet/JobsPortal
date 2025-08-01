@@ -16,39 +16,61 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On first load, check localStorage for user data
-  useEffect(() => {
+  // Validate token and restore user session
+  const validateAndRestoreSession = () => {
     const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('userData');
+    const email = localStorage.getItem('email');
+    const username = localStorage.getItem('username');
+    const fullName = localStorage.getItem('fullName');
+    const role = localStorage.getItem('role');
 
-    if (token && userData) {
-      setUser(JSON.parse(userData));
+    // Check if all required fields are present
+    if (token && email && role) {
+      // Check if token is not expired
+      const isExpired = authApiService.isTokenExpired ? authApiService.isTokenExpired(token) : false;
+      
+      if (!isExpired && token.length > 10) {
+        const userData = {
+          token,
+          email,
+          username,
+          fullName,
+          role
+        };
+        setUser(userData);
+        return true;
+      }
     }
+    
+    // Clear invalid data
+    authApiService.logout();
+    setUser(null);
+    return false;
+  };
+
+  // On first load, validate and restore user session
+  useEffect(() => {
+    validateAndRestoreSession();
     setLoading(false);
   }, []);
 
   const login = async (email, password) => {
     try {
-      const response = await loginUser({ userName: email, password }); // API call from js file
-      const userData = response;
-      console.log('Login response:', userData);
-
-      if (userData?.token) {
-        localStorage.setItem('token', userData.token);
-        localStorage.setItem('userData', JSON.stringify(userData));
-        setUser(userData);
+      const response = await loginUser({ userName: email, password });
+      
+      if (response?.token) {
+        // The authApiService already handles localStorage storage
+        setUser(response);
       }
 
-      return userData;
+      return response;
     } catch (error) {
-      console.error('Login failed:', error);
       throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
+    authApiService.logout();
     setUser(null);
   };
 
@@ -57,6 +79,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     loading,
+    validateAndRestoreSession, // Expose this for manual validation if needed
   };
 
   return (

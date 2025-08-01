@@ -22,6 +22,24 @@ const clearLoginData = () => {
   localStorage.removeItem('role');
 };
 
+// JWT token validation utility
+const isTokenExpired = (token) => {
+  if (!token) return true;
+  
+  try {
+    // Decode JWT token (base64 decode the payload part)
+    const payload = token.split('.')[1];
+    const decodedPayload = JSON.parse(atob(payload));
+    
+    // Check if token is expired
+    const currentTime = Math.floor(Date.now() / 1000);
+    return decodedPayload.exp < currentTime;
+  } catch (error) {
+    // If token is malformed, consider it expired
+    return true;
+  }
+};
+
 const getLoggedInUser = () => ({
   token: localStorage.getItem('token'),
   email: localStorage.getItem('email'),
@@ -34,6 +52,20 @@ const getLoggedInUser = () => ({
 const api = axios.create({
   headers: { 'Content-Type': 'application/json' }
 });
+
+// Add response interceptor to handle token expiration
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid, clear local storage
+      clearLoginData();
+      // Redirect to login page
+      window.location.href = '/';
+    }
+    return Promise.reject(error);
+  }
+);
 
 const authHeaders = () => {
   const token = getToken();
@@ -181,7 +213,8 @@ const authApiService = {
   delete: del,
   getToken,
   getRole,
-  getLoggedInUser
+  getLoggedInUser,
+  isTokenExpired
 };
 
 export default authApiService;

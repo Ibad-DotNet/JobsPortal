@@ -104,9 +104,16 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 app.UseHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+
+// Serve static files from wwwroot
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Handle client-side routing - serve index.html for all non-API routes
+app.MapFallbackToFile("index.html");
 
 app.Run();
