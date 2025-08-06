@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Grid,
   Card,
@@ -36,29 +37,45 @@ import {
 import { useToast } from '../contexts/ToastContext';
 import JobPostForm from '../components/recruiter/JobPostForm';
 import JobViewDialog from '../components/recruiter/JobViewDialog';
-import { jobPostsData } from '../data/mockData';
+import { getAllJobs } from '../api/apiEndpoints';
+import authApiService from '../api/authApiService';
+import { useLoading } from '../contexts/LoadingContext';
+import { LoadingButton, LoadingWrapper, LoadingSkeleton } from '../components/common';
+import { createLoadingManager } from '../utils/loadingUtils';
 
 const RecruiterDashboard = () => {
   const { showToast } = useToast();
-  const [jobPosts, setJobPosts] = useState(jobPostsData);
+  const navigate = useNavigate();
+  const { setLoading, isLoading } = useLoading();
+  const loadingManager = createLoadingManager(setLoading, isLoading);
+  const [jobPosts, setJobPosts] = useState([]);
   const [jobFormOpen, setJobFormOpen] = useState(false);
   const [jobViewOpen, setJobViewOpen] = useState(false);
   const [jobTableOpen, setJobTableOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [formMode, setFormMode] = useState('add');
 
-  const activeJobPosts = jobPosts.filter(job => job.status === 'Active').length;
+  const activeJobPosts = jobPosts.filter(job => job.isActive).length;
   const totalJobPosts = jobPosts.length;
-  const offeredCandidates = jobPosts.reduce((total, job) => 
-    total + (job.candidates?.filter(c => c.status === 'Offered').length || 0), 0
-  );
- useEffect(() => {
-   console.log("I ma here")
- })
-  // Get most recent 6 active jobs for cards
+   const offeredCandidates = 0//jobPosts.reduce((total, job) => 
+  //   total + (job.candidates?.filter(c => c.status === 'Offered').length || 0), 0
+  // );
+
+  const fetchJobs = async () => {
+    await loadingManager.execute(
+      'fetchJobs',
+      () => authApiService.get(getAllJobs),
+      (data) => setJobPosts(data),
+      (error) => console.error('Failed to fetch jobs:', error)
+    );
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
   const recentJobs = jobPosts
-    .filter(job => job.status === 'Active')
-    .slice(0, 6);
+    .filter(job => job.isActive)
+    .slice(0, 5);
 
   const handleAddJobPost = () => {
     setSelectedJob(null);
@@ -77,37 +94,66 @@ const RecruiterDashboard = () => {
     setJobFormOpen(true);
   };
 
-  const handleDeleteJob = (jobId) => {
-    setJobPosts(prev => prev.filter(j => j.id !== jobId));
-    showToast('Job post deleted successfully', 'success');
+  const handleDeleteJob = async (jobId) => {
+    await loadingManager.execute(
+      'deleteJob',
+      async () => {
+        setJobPosts(prev => prev.filter(j => j.id !== jobId));
+        return true;
+      },
+      () => showToast('Job post deleted successfully', 'success'),
+      (error) => {
+        console.error('Failed to delete job:', error);
+        showToast('Failed to delete job post', 'error');
+      }
+    );
   };
 
-  const handleToggleJobStatus = (jobId) => {
-    setJobPosts(prev => prev.map(j => 
-      j.id === jobId 
-        ? { ...j, status: j.status === 'Active' ? 'Inactive' : 'Active' }
-        : j
-    ));
-    showToast('Job status updated successfully', 'success');
+  const handleToggleJobStatus = async (jobId) => {
+    await loadingManager.execute(
+      'toggleJobStatus',
+      async () => {
+        setJobPosts(prev => prev.map(j => 
+          j.id === jobId 
+            ? { ...j, status: j.status === 'Active' ? 'Inactive' : 'Active' }
+            : j
+        ));
+        return true;
+      },
+      () => showToast('Job status updated successfully', 'success'),
+      (error) => {
+        console.error('Failed to toggle job status:', error);
+        showToast('Failed to update job status', 'error');
+      }
+    );
   };
 
-  const handleJobFormSubmit = (formData) => {
-    if (formMode === 'add') {
-      const newJob = {
-        id: Date.now(),
-        ...formData,
-        status: 'Active',
-        candidates: []
-      };
-      setJobPosts(prev => [...prev, newJob]);
-      showToast('Job post created successfully', 'success');
-    } else if (formMode === 'edit') {
-      setJobPosts(prev => prev.map(j => 
-        j.id === selectedJob.id ? { ...j, ...formData } : j
-      ));
-      showToast('Job post updated successfully', 'success');
-    }
-    setJobFormOpen(false);
+  const handleJobFormSubmit = async (formData) => {
+    await loadingManager.execute(
+      'submitJob',
+      async () => {
+        if (formMode === 'add') {
+          const newJob = {
+            id: Date.now(),
+            ...formData,
+            status: 'Active',
+            candidates: []
+          };
+          setJobPosts(prev => [...prev, newJob]);
+        } else if (formMode === 'edit') {
+          setJobPosts(prev => prev.map(j => 
+            j.id === selectedJob.id ? { ...j, ...formData } : j
+          ));
+        }
+        setJobFormOpen(false);
+        return true;
+      },
+      () => showToast(`Job post ${formMode === 'add' ? 'created' : 'updated'} successfully`, 'success'),
+      (error) => {
+        console.error('Failed to submit job form:', error);
+        showToast('Failed to save job post', 'error');
+      }
+    );
   };
 
   const handleAddCandidate = (jobId, candidateData) => {
@@ -141,7 +187,7 @@ const RecruiterDashboard = () => {
   return (
     <Box sx={{ width: '100%' }}>
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
-        Recruiter Dashboard
+        All Jobs
       </Typography>
 
       {/* Stats Cards */}
@@ -155,6 +201,7 @@ const RecruiterDashboard = () => {
                   <Typography variant="h3" sx={{ fontWeight: 600, color: 'success.main' }}>
                     {activeJobPosts}
                   </Typography>
+
                   <Typography variant="h6" color="text.secondary">
                     Active Job Posts
                   </Typography>
@@ -201,92 +248,102 @@ const RecruiterDashboard = () => {
 
       {/* Action Buttons */}
       <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <Button
+        <LoadingButton
           variant="contained"
           startIcon={<Add sx={{ fontSize: 18 }} />}
           onClick={handleAddJobPost}
+          loading={isLoading('submitJob')}
+          loadingText="Adding..."
         >
           Add New Job Post
-        </Button>
-        <Button
+        </LoadingButton>
+         <Button
           variant="outlined"
           startIcon={<ViewList sx={{ fontSize: 18 }} />}
-          onClick={() => setJobTableOpen(true)}
+          onClick={() =>navigate('/all-jobs')}
         >
           View All Jobs
         </Button>
       </Box>
-
-      {/* Recent Job Posts Cards */}
-      <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-        Recent Job Posts
-      </Typography>
       
-      <Grid container spacing={3}>
-        {recentJobs.map((job) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4} key={job.id}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, fontSize: '1.1rem' }}>
-                  {job.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, height: 40, overflow: 'hidden' }}>
-                  {job.description.substring(0, 80)}...
-                </Typography>
-                <Box sx={{ mb: 2 }}>
-                  <Chip 
-                    label={job.stage} 
-                    color={getStatusColor(job.stage)}
-                    size="small"
-                    sx={{ mb: 1 }}
-                  />
-                  <Typography variant="body2" color="text.secondary">
-                    Candidates: {getTotalCandidates(job)}
+      <LoadingWrapper
+        loading={isLoading('fetchJobs')}
+        message="Loading job posts..."
+        skeleton={true}
+        skeletonProps={{ variant: 'card', count: 6 }}
+      >
+        <Grid container spacing={3}>
+          {recentJobs.map((job) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4} key={job.id}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, fontSize: '1.1rem' }}>
+                    {job.jobName}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    ${job.salaryMin?.toLocaleString()} - ${job.salaryMax?.toLocaleString()}
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2, height: 40, overflow: 'hidden' }}>
+                    {job.jobDescription.substring(0, 350)}...
                   </Typography>
-                </Box>
-              </CardContent>
-              <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                <Button 
-                  size="small" 
-                  startIcon={<Visibility sx={{ fontSize: 16 }} />}
-                  onClick={() => handleViewJob(job)}
-                >
-                  View
-                </Button>
-                <Box>
-                  <Tooltip title="Edit">
-                    <IconButton size="small" onClick={() => handleEditJob(job)}>
-                      <Edit sx={{ fontSize: 16 }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <IconButton size="small" onClick={() => handleDeleteJob(job.id)}>
-                      <Delete sx={{ fontSize: 16 }} />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                  <Box sx={{ mb: 2 }}>
+                    <Chip 
+                      label={job.interviewStage} 
+                      color={getStatusColor(job.interviewStage)}
+                      size="small"
+                      sx={{ mb: 1 }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      Candidates: {getTotalCandidates(job)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      ${job.minimumSalary?.toLocaleString()} - ${job.maximumSalary?.toLocaleString()}
+                    </Typography>
+                  </Box>
+                </CardContent>
+                <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                  <Button 
+                    size="small" 
+                    startIcon={<Visibility sx={{ fontSize: 16 }} />}
+                    onClick={() => handleViewJob(job)}
+                  >
+                    View
+                  </Button>
+                  <Box>
+                    <Tooltip title="Edit">
+                      <IconButton size="small" onClick={() => handleEditJob(job)}>
+                        <Edit sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton 
+                        size="small" 
+                        onClick={() => handleDeleteJob(job.id)}
+                        disabled={isLoading('deleteJob')}
+                      >
+                        <Delete sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </LoadingWrapper>
 
-      {recentJobs.length === 0 && (
+      {recentJobs.length === 0 && !isLoading('fetchJobs') && (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography variant="h6" color="text.secondary">
             No active job posts found
           </Typography>
-          <Button
+          <LoadingButton
             variant="contained"
             startIcon={<Add sx={{ fontSize: 18 }} />}
             onClick={handleAddJobPost}
+            loading={isLoading('submitJob')}
+            loadingText="Creating..."
             sx={{ mt: 2 }}
           >
             Create Your First Job Post
-          </Button>
+          </LoadingButton>
         </Box>
       )}
 
@@ -309,18 +366,19 @@ const RecruiterDashboard = () => {
               <TableBody>
                 {jobPosts.map((job) => (
                   <TableRow key={job.id}>
-                    <TableCell>{job.title}</TableCell>
+                    <TableCell>{job.jobName}</TableCell>
                     <TableCell>
                       <Switch
-                        checked={job.status === 'Active'}
+                        checked={job.isActive}
                         onChange={() => handleToggleJobStatus(job.id)}
                         color="primary"
+                        disabled={isLoading('toggleJobStatus')}
                       />
-                      {job.status}
+                      {job.isActive}
                     </TableCell>
-                    <TableCell>{job.stage}</TableCell>
+                    <TableCell>{job.interviewStage}</TableCell>
                     <TableCell>{getTotalCandidates(job)}</TableCell>
-                    <TableCell>${job.salaryMin?.toLocaleString()} - ${job.salaryMax?.toLocaleString()}</TableCell>
+                    <TableCell>${job.minimumSalary?.toLocaleString()} - ${job.maximumSalary?.toLocaleString()}</TableCell>
                     <TableCell align="center">
                       <Tooltip title="View">
                         <IconButton onClick={() => handleViewJob(job)}>
@@ -333,7 +391,10 @@ const RecruiterDashboard = () => {
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Delete">
-                        <IconButton onClick={() => handleDeleteJob(job.id)}>
+                        <IconButton 
+                          onClick={() => handleDeleteJob(job.id)}
+                          disabled={isLoading('deleteJob')}
+                        >
                           <Delete sx={{ fontSize: 18 }} />
                         </IconButton>
                       </Tooltip>

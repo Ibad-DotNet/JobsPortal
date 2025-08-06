@@ -14,7 +14,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // On first load, check localStorage for user data
   useEffect(() => {
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     if (token && userData) {
       setUser(JSON.parse(userData));
     }
-    setLoading(false);
+    setAuthLoading(false);
   }, []);
 
   const login = async (email, password) => {
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     user,
     login,
     logout,
-    loading,
+    loading: authLoading,
   };
 
   return (

@@ -38,7 +38,7 @@ export const ToastProvider = ({ children }) => {
       {children}
       <Snackbar
         open={toast.open}
-        autoHideDuration={4000}
+        autoHideDuration={1}
         onClose={hideToast}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >

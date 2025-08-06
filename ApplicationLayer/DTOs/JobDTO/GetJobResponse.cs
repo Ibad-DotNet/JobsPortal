@@ -11,6 +11,7 @@ namespace ApplicationLayer.DTOs.JobDTO
         public long Id { get; set; }
         public string JobName { get; set; } = "";
         public string JobDescription { get; set; } = "";
+        public string InterviewStage { get; set; } = "";
         public bool IsActive { get; set; }
         public decimal MinimumSalary { get; set; }
         public decimal MaximumSalary { get; set; }
