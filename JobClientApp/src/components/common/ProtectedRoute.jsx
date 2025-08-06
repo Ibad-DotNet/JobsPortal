@@ -1,12 +1,19 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import LoadingWrapper from './LoadingWrapper';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <LoadingWrapper 
+        loading={true} 
+        message="Checking authentication..."
+        minHeight="100vh"
+      />
+    );
   }
 
   if (!user) {

@@ -39,24 +39,38 @@ import {
   deleteRecruiter,
   toggleRecruiterStatus,
 } from '../api/apiEndpoints';
+import { useLoading } from '../contexts/LoadingContext';
+import { LoadingButton, LoadingWrapper, LoadingSkeleton } from '../components/common';
+import { createLoadingManager } from '../utils/loadingUtils';
 
 const AdminDashboard = () => {
+  const { setLoading, isLoading } = useLoading();
+  const loadingManager = createLoadingManager(setLoading, isLoading);
   const [recruiters, setRecruiters] = useState([]);
   const [formOpen, setFormOpen] = useState(false);
   const [selectedRecruiter, setSelectedRecruiter] = useState(null);
   const [formMode, setFormMode] = useState('add'); // 'add', 'view', 'edit'
   const [recruiterCounts, setRecruiterCounts] = useState({
-  total: 0,
-  active: 0,
-});
-const fetchRecruiterCounts = async () => {
-  const data = await authApiService.get(getRecruitersCount);
-  if (data) setRecruiterCounts(data);
-};
+    total: 0,
+    active: 0,
+  });
 
-const fetchRecruiters = async () => {
-    const data = await authApiService.get(getAllRecruiters);
-    if (data) setRecruiters(data);
+  const fetchRecruiterCounts = async () => {
+    await loadingManager.execute(
+      'fetchCounts',
+      () => authApiService.get(getRecruitersCount),
+      (data) => setRecruiterCounts(data),
+      (error) => console.error('Failed to fetch recruiter counts:', error)
+    );
+  };
+
+  const fetchRecruiters = async () => {
+    await loadingManager.execute(
+      'fetchRecruiters',
+      () => authApiService.get(getAllRecruiters),
+      (data) => setRecruiters(data),
+      (error) => console.error('Failed to fetch recruiters:', error)
+    );
   };
 
   useEffect(() => {
@@ -83,42 +97,75 @@ const fetchRecruiters = async () => {
   };
 
   const handleDeleteRecruiter = async (id) => {
-    const endpoint = deleteRecruiter(id);
-    const success = await authApiService.delete(endpoint);
-    if (success) {
-      fetchRecruiters();
-      fetchRecruiterCounts();
-    }
+    await loadingManager.execute(
+      'deleteRecruiter',
+      async () => {
+        const endpoint = deleteRecruiter(id);
+        return await authApiService.delete(endpoint);
+      },
+      async (success) => {
+        if (success) {
+          await fetchRecruiters();
+          await fetchRecruiterCounts();
+        }
+      },
+      (error) => console.error('Failed to delete recruiter:', error)
+    );
   };
 
   const handleToggleStatus = async (recruiter) => {
-    const updatedRecruiter = {
-      id: recruiter.id,
-      isActive: !recruiter.isActive 
-    };
-    const success = await authApiService.patch(toggleRecruiterStatus, updatedRecruiter);
-    if (success) {
-      fetchRecruiters();
-      fetchRecruiterCounts();
-    }
+    await loadingManager.execute(
+      'toggleStatus',
+      async () => {
+        const updatedRecruiter = {
+          id: recruiter.id,
+          isActive: !recruiter.isActive 
+        };
+        return await authApiService.patch(toggleRecruiterStatus, updatedRecruiter);
+      },
+      async (success) => {
+        if (success) {
+          await fetchRecruiters();
+          await fetchRecruiterCounts();
+        }
+      },
+      (error) => console.error('Failed to toggle status:', error)
+    );
   };
 
   const handleFormSubmit = async (formData) => {
     if (formMode === 'add') {
-      const success = await authApiService.post(addRecruiter, formData);
-      if (success) fetchRecruiters();
+      await loadingManager.execute(
+        'addRecruiter',
+        () => authApiService.post(addRecruiter, formData),
+        async (success) => {
+          if (success) {
+            await fetchRecruiters();
+            setFormOpen(false);
+          }
+        },
+        (error) => console.error('Failed to add recruiter:', error)
+      );
     } else if (formMode === 'edit') {
-      const payload = {
-        id: selectedRecruiter.id,
-        ...formData
-      };
-      const success = await authApiService.put(updateRecruiter, payload);
-      if (success) {
-        fetchRecruiters();
-        fetchRecruiterCounts();
-      }
+      await loadingManager.execute(
+        'updateRecruiter',
+        async () => {
+          const payload = {
+            id: selectedRecruiter.id,
+            ...formData
+          };
+          return await authApiService.put(updateRecruiter, payload);
+        },
+        async (success) => {
+          if (success) {
+            await fetchRecruiters();
+            await fetchRecruiterCounts();
+            setFormOpen(false);
+          }
+        },
+        (error) => console.error('Failed to update recruiter:', error)
+      );
     }
-    setFormOpen(false);
   };
 
   return (
@@ -167,58 +214,75 @@ const fetchRecruiters = async () => {
 
       {/* Buttons */}
       <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <Button variant="contained" startIcon={<Add />} onClick={handleAddRecruiter}>
+        <LoadingButton 
+          variant="contained" 
+          startIcon={<Add />} 
+          onClick={handleAddRecruiter}
+          loading={isLoading('addRecruiter')}
+          loadingText="Adding..."
+        >
           Add Recruiter
-        </Button>
+        </LoadingButton>
       </Box>
 
       {/* Table */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Gender</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {recruiters.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell>{r.name}</TableCell>
-                <TableCell>{r.email}</TableCell>
-                <TableCell>{r.gender}</TableCell>
-                <TableCell>
-                  <Switch
-                    checked={r.isActive}
-                    onChange={() => handleToggleStatus(r)}
-                    color="primary"
-                  />
-                </TableCell>
-                <TableCell align="center">
-                  <Tooltip title="View">
-                    <IconButton onClick={() => handleViewRecruiter(r)}>
-                      <Visibility sx={{ fontSize: 18 }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Edit">
-                    <IconButton onClick={() => handleEditRecruiter(r)}>
-                      <Edit sx={{ fontSize: 18 }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <IconButton onClick={() => handleDeleteRecruiter(r.id)}>
-                      <Delete sx={{ fontSize: 18 }} />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+      <LoadingWrapper
+        loading={isLoading('fetchRecruiters')}
+        message="Loading recruiters..."
+        skeleton={true}
+        skeletonProps={{ variant: 'table', count: 5 }}
+      >
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Gender</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell align="center">Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {recruiters.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell>{r.name}</TableCell>
+                  <TableCell>{r.email}</TableCell>
+                  <TableCell>{r.gender}</TableCell>
+                  <TableCell>
+                    <Switch
+                      checked={r.isActive}
+                      onChange={() => handleToggleStatus(r)}
+                      color="primary"
+                      disabled={isLoading('toggleStatus')}
+                    />
+                  </TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="View">
+                      <IconButton onClick={() => handleViewRecruiter(r)}>
+                        <Visibility sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Edit">
+                      <IconButton onClick={() => handleEditRecruiter(r)}>
+                        <Edit sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton 
+                        onClick={() => handleDeleteRecruiter(r.id)}
+                        disabled={isLoading('deleteRecruiter')}
+                      >
+                        <Delete sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </LoadingWrapper>
 
       {/* Form Dialog */}
       <Dialog open={formOpen} onClose={() => setFormOpen(false)} maxWidth="md" fullWidth>

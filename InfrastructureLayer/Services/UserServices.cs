@@ -15,21 +15,21 @@ namespace InfrastructureLayer.Services
         private readonly AppDbContext _appDbContext;
         private readonly IConfiguration _configuration;
         private readonly TokenServices _tokenServices;
-        public UserServices(AppDbContext appDbContext,IConfiguration configuration,TokenServices token)
+        public UserServices(AppDbContext appDbContext, IConfiguration configuration, TokenServices token)
         {
             _appDbContext = appDbContext;
             _configuration = configuration;
             _tokenServices = token;
         }
-        public async  Task<ResponseVM> Login(LoginUserRequest newUser)
+        public async Task<ResponseVM> Login(LoginUserRequest newUser)
         {
             ResponseVM responseVM = new ResponseVM();
             try
             {
-                var user = await _appDbContext.UserEntity.FirstOrDefaultAsync(u =>u.IsActive && (u.UserName == newUser.UserName || u.Email == newUser.UserName));
+                var user = await _appDbContext.UserEntity.FirstOrDefaultAsync(u => u.IsActive && (u.UserName == newUser.UserName || u.Email == newUser.UserName));
                 if (user != null)
                 {
-                    if ( BasicUtiltiy.VerifyPassword( newUser.Password, user.Password))
+                    if (BasicUtiltiy.VerifyPassword(newUser.Password, user.Password))
                     {
                         responseVM.Code = StatusCodeEnum.Success;
                         responseVM.Message = ResponseValues.LoginSuccess;
@@ -55,8 +55,8 @@ namespace InfrastructureLayer.Services
             }
             catch (Exception ex)
             {
-                responseVM.Code=StatusCodeEnum.InternalServerError;
-                responseVM.Message= ResponseValues.InternalServer + ex.Message;
+                responseVM.Code = StatusCodeEnum.InternalServerError;
+                responseVM.Message = ResponseValues.InternalServer + ex.Message;
             }
             return responseVM;
         }
@@ -65,7 +65,7 @@ namespace InfrastructureLayer.Services
             ResponseVM responseVM = new ResponseVM();
             if (_tokenServices.Role?.ToLower() == UserRolesValues.Admin.ToLower())
             {
-                var existingUser= _appDbContext.UserEntity.FirstOrDefault(u=>u.Email== request.Email);
+                var existingUser = _appDbContext.UserEntity.FirstOrDefault(u => u.Email == request.Email);
                 if (existingUser == null)
                 {
                     UserEntity user = new UserEntity();
@@ -74,9 +74,9 @@ namespace InfrastructureLayer.Services
                     user.Password = request.Password;
                     user.Gender = request.Gender;
                     user.UserName = request.Email.Split('@')[0];
-                    user.AddedBy=_tokenServices.UserEmail;
+                    user.AddedBy = _tokenServices.UserEmail;
                     user.AddedDate = DateTime.Now;
-                    user.Password=BasicUtiltiy.EncryptedPassword(request.Password);
+                    user.Password = BasicUtiltiy.EncryptedPassword(request.Password);
                     await _appDbContext.AddAsync(user);
                     await _appDbContext.SaveChangesAsync();
                     responseVM.Code = StatusCodeEnum.Success;
@@ -91,14 +91,14 @@ namespace InfrastructureLayer.Services
             else
             {
                 responseVM.Code = StatusCodeEnum.UnAuthorized;
-                responseVM.Message=ResponseValues.UnAuthorized;
+                responseVM.Message = ResponseValues.UnAuthorized;
             }
-                return responseVM;
+            return responseVM;
         }
         public async Task<ResponseVM> GetAllUsers()
         {
             var response = new ResponseVM();
-            var users = await _appDbContext.UserEntity.Where(u=>u.Role!="Admin").ToListAsync();
+            var users = await _appDbContext.UserEntity.Where(u => u.Role != "Admin").ToListAsync();
             response.Code = StatusCodeEnum.Success;
             response.Data = users.Select(u => new GetUserResponse
             {
@@ -121,7 +121,7 @@ namespace InfrastructureLayer.Services
             response.Data = new
             {
                 Total = users.Count(),
-                Active=users.Where(u=>u.IsActive).Count()
+                Active = users.Where(u => u.IsActive).Count()
             };
             response.Message = ResponseValues.Success;
             return response;

@@ -3,27 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import {
   Paper,
   TextField,
-  Button,
   Typography,
   Box,
-  CircularProgress,
   Alert,
   Grid
 } from '@mui/material';
 import { Business } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { useLoading } from '../contexts/LoadingContext';
+import LoadingButton from '../components/common/LoadingButton';
 
 const Login = () => {
   const { login } = useAuth(); 
+  const { setLoading, isLoading } = useLoading();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setLoading('login', true);
     setError('');
 
     try {
@@ -39,7 +39,7 @@ const Login = () => {
     } catch (err) {
       setError(typeof err === 'string' ? err : 'Login failed');
     } finally {
-      setLoading(false);
+      setLoading('login', false);
     }
   };
 
@@ -74,15 +74,16 @@ const Login = () => {
 
               {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
 
-              <Button
+              <LoadingButton
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, py: 1.5 }}
-                disabled={loading}
+                loading={isLoading('login')}
+                loadingText="Signing In..."
               >
-                {loading ? <CircularProgress size={24} /> : 'Sign In'}
-              </Button>
+                Sign In
+              </LoadingButton>
             </Box>
 
             <Box sx={{ mt: 3, textAlign: 'center' }}>

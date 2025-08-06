@@ -63,7 +63,8 @@ namespace InfrastructureLayer.Services
                 JobDescription = job.JobDescription,
                 MinimumSalary = job.MinimumSalary,
                 MaximumSalary = job.MaximumSalary,
-                IsActive = job.IsActive
+                IsActive = job.IsActive,
+                InterviewStage =JobStageEnum.Stages[job.InterviewStages].Stage
             });
 
             return new ResponseVM
