@@ -1,0 +1,1 @@
+kRUC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\JobsPortal.csproj¢net8.0òCSharp12

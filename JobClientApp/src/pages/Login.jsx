@@ -28,14 +28,14 @@ const Login = () => {
 
     try {
       const userData = await login(email, password); // ✅ Context-based login
-
-      if (userData?.role === 'Admin') {
-        navigate('/administrator');
-      } else if (userData?.role === 'Recruiter') {
-        navigate('/recruiter');
-      } else {
-        setError('Invalid role');
-      }
+      navigate('/administrator');
+      // if (userData?.role === 'Admin') {
+      //   navigate('/administrator');
+      // } else if (userData?.role === 'Recruiter') {
+      //   navigate('/recruiter');
+      // } else {
+      //   setError('Invalid role');
+      // }
     } catch (err) {
       setError(typeof err === 'string' ? err : 'Login failed');
     } finally {

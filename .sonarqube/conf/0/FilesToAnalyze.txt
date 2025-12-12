@@ -1,0 +1,9 @@
+﻿C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\BaseEntities\BaseEntity.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\CandidateEntities\CandidateEntity.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\JobEntities\JobEntity.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\JobEntities\JobStages.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\UserEntities\UserEntity.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Enums\JobStageEnum.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Enums\ResponseValues.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Enums\StatusCodeEnum.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Enums\UserRolesValues.cs
