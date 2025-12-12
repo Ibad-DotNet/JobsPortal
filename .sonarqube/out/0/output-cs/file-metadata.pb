@@ -1,0 +1,13 @@
+|
+qC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\obj\Debug\net8.0\DomainLayer.AssemblyInfo.csutf-8ê
+ÑC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\obj\Debug\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.csutf-8e
+\C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Enums\StatusCodeEnum.csutf-8~
+sC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\obj\Debug\net8.0\DomainLayer.GlobalUsings.g.csutf-8f
+]C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Enums\UserRolesValues.csutf-8e
+\C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Enums\ResponseValues.csutf-8c
+ZC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Enums\JobStageEnum.csutf-8q
+hC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\UserEntities\UserEntity.csutf-8o
+fC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\JobEntities\JobStages.csutf-8o
+fC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\JobEntities\JobEntity.csutf-8{
+rC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\CandidateEntities\CandidateEntity.csutf-8q
+hC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\DomainLayer\Entities\BaseEntities\BaseEntity.csutf-8

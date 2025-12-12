@@ -1,0 +1,16 @@
+﻿C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Context\AppDbContext.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Migrations\20250627153352_user+jobs+tables.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Migrations\20250627153352_user+jobs+tables.Designer.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Migrations\20250627192055_userGender+jobIsDeleted.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Migrations\20250627192055_userGender+jobIsDeleted.Designer.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Migrations\20250725193357_candidate-updates.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Migrations\20250725193357_candidate-updates.Designer.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Migrations\AppDbContextModelSnapshot.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Services\CandidateService.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Services\JobServices.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Services\TokenServices.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Services\UserServices.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Utilities\AWS_StorageUtility.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Utilities\BasicUtiltiy.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Utilities\JWTUtility.cs
+C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\InfrastructureLayer\Utilities\StorageUtility.cs

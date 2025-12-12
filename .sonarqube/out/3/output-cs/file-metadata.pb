@@ -1,0 +1,10 @@
+é
+ÇC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\obj\Debug\net8.0\JobsPortal.MvcApplicationPartsAssemblyInfo.csutf-8z
+oC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\obj\Debug\net8.0\JobsPortal.AssemblyInfo.csutf-8è
+ÉC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\obj\Debug\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.csutf-8|
+qC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\obj\Debug\net8.0\JobsPortal.GlobalUsings.g.csutf-8W
+NC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\Program.csutf-8z
+qC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\Controllers\UserControllers\UserController.csutf-8x
+oC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\Controllers\JobControllers\JobController.csutf-8Ñ
+{C:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\Controllers\CandidateControllers\CandidateController.csutf-8s
+jC:\Users\HP\Desktop\VolmatcaProjects\VolmaticaJobsPortal\JobsPortal\Configurations\CustomConfigurations.csutf-8
